@@ -53,7 +53,7 @@
     /**define trial-dependent properties**/
     var trial_paras = [
       {stimulus: "img/blue.png", data: {correct_response: 'f'}},
-      {stimulus: "img/orange.png", data: {correct_response: 'g'}},
+      {stimulus: "img/orange.png", data: {correct_response: 'j'}},
       {stimulus: "img/blue.png", data: {correct_response: 'f'}}
     ]
 
@@ -90,19 +90,18 @@
       timeline_variables: trial_paras
     }
 
-
     /*save data*/
-    var save_data_block = {
+    var save_data = {
       type: 'call-function',
       func: function(){
-        data = jsPsych.data.get().filter({trial_type: 'stim'}).json()
-        save_data(data, "wtw")
-      },
+        data = jsPsych.data.get().filter({trialType: 'stim'}).json()
+        saveData(data, "RT")
+      }
     }
 
     /* initialize the exmperiment */
     jsPsych.init({
-      timeline: [change_colors, instructions, RT_block], 
+      timeline: [change_colors, instructions, RT_block, save_data], 
       on_finish: function() {
         jsPsych.data.displayData()// display all the recorded data after the experiment ends
       }
