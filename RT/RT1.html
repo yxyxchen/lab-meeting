@@ -1,0 +1,37 @@
+<!-- /*
+* working experiment
+*/ -->
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RT Experiment</title>
+    <script src="jspsych/jspsych.js"></script>
+    <script src="jspsych/plugins/jspsych-html-keyboard-response.js"></script>
+    <link href="jspsych/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body></body> 
+  <script>
+
+    /* define instructions trial */
+    var instructions = {
+      type: "html-keyboard-response",  // plugin type
+      stimulus: "<p>In this experiment, a circle will appear in the center " +
+      "of the screen.</p><p>If the circle is <strong>blue</strong>, " +
+      "press the letter F on the keyboard as fast as you can.</p>" +
+      "<p>If the circle is <strong>orange</strong>, press the letter J " +
+      "as fast as you can.</p>" +
+      "<p>Press any key to begin.</p>"
+    }
+
+    /* initialize the exmperiment */
+    jsPsych.init({
+      timeline: [instructions], 
+      on_finish: function() {
+        jsPsych.data.displayData()// display all the recorded data after the experiment ends
+      }
+    })
+
+  </script>
+</html>

@@ -1,0 +1,112 @@
+<!-- /*
+* working experiment
+*/ -->
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RT Experiment</title>
+    <script src="jspsych/jspsych.js"></script>
+    <script src="jspsych/plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="save_data.js"></script>
+    <script src="jspsych/plugins/jspsych-image-keyboard-response.js"></script>
+    <link href="jspsych/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+    <!--libraires loaded for changing the background color-->
+    <script src="jspsych/plugins/jspsych-call-function.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+  </head>
+  <body></body> 
+  <script>
+
+    /* change the background color */
+    var change_colors = {
+      type: 'call-function',
+      func: function(){
+        $('.jspsych-display-element').css('background-color', 'grey')
+        $('.jspsych-display-element').css('color', 'white')
+      },
+      // record additional variables 
+      on_finish:function(data){
+        data.trialType = "change_colors"
+      }
+    }
+
+    /* define instructions trial */
+    var instructions = {
+      type: "html-keyboard-response",  // plugin type
+      stimulus: "<p>In this experiment, a circle will appear in the center " +
+      "of the screen.</p><p>If the circle is <strong>blue</strong>, " +
+      "press the letter F on the keyboard as fast as you can.</p>" +
+      "<p>If the circle is <strong>orange</strong>, press the letter J " +
+      "as fast as you can.</p>" +
+      "<p>Press any key to begin.</p>",// add other inputs if needed
+      // record additional variables
+      on_finish:function(data){
+        data.trialType = "instructions"
+      }
+    }
+
+    /*RT*/
+
+    /**define trial-dependent properties**/
+    var trial_paras = [
+      {stimulus: "img/blue.png", data: {correct_response: 'f'}},
+      {stimulus: "img/orange.png", data: {correct_response: 'g'}},
+      {stimulus: "img/blue.png", data: {correct_response: 'f'}}
+    ]
+
+    var fixation = {
+      type: 'html-keyboard-response',
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 1000,
+      on_finish:function(data){
+        data.trialType = "fixation"
+      }
+    }
+
+    var stim = {
+      type: 'image-keyboard-response',
+      stimulus: jsPsych.timelineVariable('stimulus'),
+      choices: ['f', 'j'],
+      data: jsPsych.timelineVariable('data'),
+      on_finish:function(data){
+        data.trialType = "stim"
+        // calculate the trial Index by counting existing fixation trials 
+        data.trialIdx = jsPsych.data.get().filter({trialType: 'fixation'}).count()
+        console.log(`Trial ${data.trialIdx}`)  // BTW, this is the javascript equivalent to printf, much like that in linux
+        // decide whether the response is correct
+        console.log(data.correct_response)
+        data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(data.correct_response);
+        console.log(`Correct: ${data.correct}`)
+      }
+    }
+
+    /*sub timeline*/
+    var RT_block = {
+      timeline: [fixation, stim],
+      timeline_variables: trial_paras
+    }
+
+
+    /*save data*/
+    var save_data_block = {
+      type: 'call-function',
+      func: function(){
+        data = jsPsych.data.get().filter({trial_type: 'stim'}).json()
+        save_data(data, "wtw")
+      },
+    }
+
+    /* initialize the exmperiment */
+    jsPsych.init({
+      timeline: [change_colors, instructions, RT_block], 
+      on_finish: function() {
+        jsPsych.data.displayData()// display all the recorded data after the experiment ends
+      }
+    })
+
+  </script>
+</html>
